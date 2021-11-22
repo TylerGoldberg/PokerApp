@@ -3,7 +3,6 @@ package com.example.poker;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
