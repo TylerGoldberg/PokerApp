@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.poker">
+    package="com.example.poker" >
 
     <application
         android:allowBackup="true"
@@ -10,7 +10,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Poker">
         <activity
+            android:name=".anonymousLogin"
+            android:exported="false" />
+        <activity
+            android:name=".serverList"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".StartActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

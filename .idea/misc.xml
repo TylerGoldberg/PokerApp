@@ -3,7 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/chaos/Desktop/POOPproject/PokerApp/app/src/main/res/layout/activity_anonymous_login.xml" value="0.490036231884058" />
+        <entry key="..\:/Users/chaos/Desktop/POOPproject/PokerApp/app/src/main/res/layout/activity_login.xml" value="0.490036231884058" />
         <entry key="..\:/Users/chaos/Desktop/POOPproject/PokerApp/app/src/main/res/layout/activity_main.xml" value="0.490036231884058" />
+        <entry key="..\:/Users/chaos/Desktop/POOPproject/PokerApp/app/src/main/res/layout/activity_main2.xml" value="0.490036231884058" />
+        <entry key="..\:/Users/chaos/Desktop/POOPproject/PokerApp/app/src/main/res/layout/activity_register.xml" value="0.490036231884058" />
+        <entry key="..\:/Users/chaos/Desktop/POOPproject/PokerApp/app/src/main/res/layout/activity_server_list.xml" value="0.490036231884058" />
+        <entry key="..\:/Users/chaos/Desktop/POOPproject/PokerApp/app/src/main/res/layout/activity_start.xml" value="0.490036231884058" />
       </map>
     </option>
   </component>
