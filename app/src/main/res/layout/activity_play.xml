@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding ="30dp"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:textAlignment="center"
+        android:layout_above="@id/poolcards"
+        android:text="Pool"
+        android:layout_marginBottom="-30dp"/>
+
+    <LinearLayout
+        android:id="@+id/poolcards"
+        android:layout_width="wrap_content"
+        android:layout_height="138dp"
+        android:orientation="horizontal"
+        android:layout_below="@id/playerMoney"
+        android:layout_marginTop="20dp">
+
+        <ImageView
+            android:id="@+id/poolcard_1"
+            android:layout_width="72dp"
+            android:layout_height="136dp"
+            android:layout_weight="1"
+            android:src="@drawable/red_joker"/>
+
+        <ImageView
+            android:id="@+id/poolcard_2"
+            android:layout_width="72dp"
+            android:layout_height="136dp"
+            android:layout_weight="1"
+            android:src="@drawable/red_joker"/>
+
+        <ImageView
+            android:id="@+id/poolcard_3"
+            android:layout_width="72dp"
+            android:layout_height="136dp"
+            android:layout_weight="1"
+            android:src="@drawable/red_joker"/>
+
+        <ImageView
+            android:id="@+id/poolcard_4"
+            android:layout_width="72dp"
+            android:layout_height="136dp"
+            android:layout_weight="1"
+            android:src="@drawable/red_joker"/>
+
+        <ImageView
+            android:id="@+id/poolcard_5"
+            android:layout_width="72dp"
+            android:layout_height="136dp"
+            android:layout_weight="1"
+            android:src="@drawable/red_joker"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="20dp">
+
+
+        <Button
+            android:id="@+id/fold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Fold" />
+
+        <Button
+            android:id="@+id/raise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:text="Raise" />
+
+        <Button
+            android:id="@+id/stay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Stay" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/playerMoney"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:text="Your Money: 0"
+        android:textSize="22sp"
+        />
+    <TextView
+        android:id="@+id/potMoney"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="Pot Money: 0"
+        android:layout_marginTop="20dp"
+        android:textSize="22sp"
+        android:layout_toRightOf="@id/playerMoney"
+        />
+
+    <LinearLayout
+    android:id="@+id/cardhand"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+        android:layout_above="@+id/buttons"
+    android:orientation="horizontal">
+
+
+    <ImageView
+        android:id="@+id/iv_card2"
+        android:layout_width="150dp"
+        android:layout_height="218dp"
+        android:layout_weight="1"
+        android:scaleType="centerInside"
+        android:src="@drawable/red_joker" />
+
+    <ImageView
+        android:id="@+id/iv_card1"
+        android:layout_width="150dp"
+        android:layout_height="218dp"
+        android:layout_weight="1"
+        android:scaleType="centerInside"
+        android:src="@drawable/red_joker" />
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>
