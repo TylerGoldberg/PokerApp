@@ -102,7 +102,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
         android:text="P1 Money: 0"
-        android:textSize="22sp"
+        android:textSize="18sp"
         />
     <TextView
         android:id="@+id/p2MoneyView"
@@ -110,7 +110,7 @@
         android:layout_height="50dp"
         android:text="P2 Money: 0"
         android:layout_marginTop="20dp"
-        android:textSize="22sp"
+        android:textSize="18sp"
         android:layout_toRightOf="@id/p1MoneyView"
         />
 

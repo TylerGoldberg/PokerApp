@@ -52,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
     String roomName = "";
     String role = "";
 
-    /*int potMoney;*/
+    int p1Money;
+    int p2Money;
+    int potMoney;
 
     FirebaseDatabase database;
     DatabaseReference messageRef;
@@ -112,6 +114,11 @@ public class MainActivity extends AppCompatActivity {
 
         playPoker.Deck deck = new playPoker.Deck();
 
+        p1Money = 3000;
+        p2Money = 3000;
+        p1MoneyView.setText("P1 Money :" + p1Money);
+        p2MoneyView.setText("P2 Money :" + p2Money);
+
 
         if(role.equals("guest")) // for now only host can start game
         {
@@ -149,21 +156,21 @@ public class MainActivity extends AppCompatActivity {
                     card4.setImageResource(cardResource);
                 }
 
-                /*
+
                 p1Money -= 20;
                 p2Money -= 20;
                 potMoney = 40;
-                p1MoneyView.setText("P1 Money: "+ String.valueOf(p1Money));
-                p1MoneyView.setText("P2 Money: "+ String.valueOf(p2Money));
-                fold.setVisibility(View.VISIBLE);
-                raise.setVisibility(View.VISIBLE);
-                stay.setVisibility(View.VISIBLE);
+
+                p1MoneyView.setText("P1 Money: "+ p1Money);
+                p2MoneyView.setText("P2 Money: "+ p2Money);
+
 
                 boolean playOver = false; // set play over to false
                 boolean hostTurn = true;
                 boolean guestTurn = false;
                 int timesRaised = 0;
 
+                /*
                 while(!playOver) // alternate turns until play is over
                 {
                     if(hostTurn && role.equals("host"))
