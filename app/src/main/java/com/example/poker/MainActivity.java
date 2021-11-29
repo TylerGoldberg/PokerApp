@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
 
     Button raise;
@@ -43,12 +45,14 @@ public class MainActivity extends AppCompatActivity {
     TextView winText;
     TextView loseText;
 
-    TextView playerMoney;
-    TextView potMoney;
+    TextView p1MoneyView;
+    TextView p2MoneyView;
 
     String playerName = "";
     String roomName = "";
     String role = "";
+
+    /*int potMoney;*/
 
     FirebaseDatabase database;
     DatabaseReference messageRef;
@@ -74,6 +78,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        final boolean[] p1Fold = {false};
+        final boolean[] p2Fold = {false};
+
+
+
         fold = findViewById(R.id.fold);
         raise = findViewById(R.id.raise);
         stay = findViewById(R.id.stay);
@@ -89,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
         poolcard_4 = (ImageView) findViewById(R.id.poolcard_4);
         poolcard_5 = (ImageView) findViewById(R.id.poolcard_5);
 
-        playerMoney = (TextView) findViewById(R.id.playerMoney);
-        potMoney = (TextView) findViewById(R.id.potMoney);
+        p1MoneyView = (TextView) findViewById(R.id.p1MoneyView);
+        p2MoneyView = (TextView) findViewById(R.id.p2MoneyView);
 
         loseText = (TextView) findViewById(R.id.loseText);
         winText = (TextView) findViewById(R.id.winText);
@@ -104,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         playPoker.Deck deck = new playPoker.Deck();
 
 
-        if(role.equals("guest"))
+        if(role.equals("guest")) // for now only host can start game
         {
             play.setVisibility(View.GONE);
         }
@@ -112,12 +121,115 @@ public class MainActivity extends AppCompatActivity {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                play.setVisibility(View.GONE); // get rid of play button and start play
+                winText.setVisibility(View.GONE);
+                loseText.setVisibility(View.GONE);
+
                 deck.shuffle();
                 int i = 0;
+                p2card1 = deck.cards.get(i++);
+                p1card1 = deck.cards.get(i++);
+                p2card2 = deck.cards.get(i++);
+                p1card2 = deck.cards.get(i++); // deal cards
+
+                if(role.equals("host"))
+                {
+                    int cardResource = getResources().getIdentifier((p1card1.toString()).toLowerCase(),"drawable",getPackageName());
+                    card1.setImageResource(cardResource);
+                    cardResource = getResources().getIdentifier(p1card2.toString().toLowerCase(),"drawable",getPackageName());
+                    card2.setImageResource(cardResource);
+                }
+
+                if(role.equals("guest"))
+                {
+                    int cardResource = getResources().getIdentifier(p2card1.toString().toLowerCase(),"drawable",getPackageName());
+                    card3.setImageResource(cardResource);
+                    cardResource = getResources().getIdentifier(p2card2.toString().toLowerCase(),"drawable",getPackageName());
+                    card4.setImageResource(cardResource);
+                }
+
+                /*
+                p1Money -= 20;
+                p2Money -= 20;
+                potMoney = 40;
+                p1MoneyView.setText("P1 Money: "+ String.valueOf(p1Money));
+                p1MoneyView.setText("P2 Money: "+ String.valueOf(p2Money));
+                fold.setVisibility(View.VISIBLE);
+                raise.setVisibility(View.VISIBLE);
+                stay.setVisibility(View.VISIBLE);
+
+                boolean playOver = false; // set play over to false
+                boolean hostTurn = true;
+                boolean guestTurn = false;
+                int timesRaised = 0;
+
+                while(!playOver) // alternate turns until play is over
+                {
+                    if(hostTurn && role.equals("host"))
+                    {
+                        fold.setVisibility(View.VISIBLE);
+                        raise.setVisibility(View.VISIBLE);
+                        stay.setVisibility(View.VISIBLE);
+
+                        if(p1Fold[0])
+                        {
+                            p2Money += potMoney;
+                            if(role.equals("host"))
+                            {
+                                loseText.setVisibility(View.VISIBLE);
+                                play.setVisibility(View.VISIBLE);
+                            }
+                            if(role.equals("guest"))
+                                winText.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    if(guestTurn && role.equals("guest"))
+                    {
+                        fold.setVisibility(View.VISIBLE);
+                        raise.setVisibility(View.VISIBLE);
+                        stay.setVisibility(View.VISIBLE);
+                    }
+
+                }*/
+
 
 
             }
+
+
+
+
         });
+
+        /*fold.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(role.equals("host"))
+                    p1Fold[0] = true;
+                if(role.equals("guest"))
+                {
+                    p2Fold[0] = true;
+                }
+            }
+        });
+
+        raise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        stay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });*/
+
+
+
 
     }
 

@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="138dp"
         android:orientation="horizontal"
-        android:layout_below="@id/playerMoney"
+        android:layout_below="@id/p1MoneyView"
         android:layout_marginTop="20dp">
 
         <ImageView
@@ -97,21 +97,21 @@
 
 
     <TextView
-        android:id="@+id/playerMoney"
+        android:id="@+id/p1MoneyView"
         android:layout_width="200dp"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
-        android:text="Your Money: 0"
+        android:text="P1 Money: 0"
         android:textSize="22sp"
         />
     <TextView
-        android:id="@+id/potMoney"
+        android:id="@+id/p2MoneyView"
         android:layout_width="200dp"
         android:layout_height="50dp"
-        android:text="Pot Money: 0"
+        android:text="P2 Money: 0"
         android:layout_marginTop="20dp"
         android:textSize="22sp"
-        android:layout_toRightOf="@id/playerMoney"
+        android:layout_toRightOf="@id/p1MoneyView"
         />
 
     <LinearLayout

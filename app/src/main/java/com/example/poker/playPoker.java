@@ -35,7 +35,7 @@ public class playPoker{
         }
         @Override
         public String toString() {
-            return String.valueOf(value);
+            return suit.toString() + value.toString();
         }
 
         @Override
