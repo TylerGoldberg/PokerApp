@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "703266157821",
+    "project_id": "pokerapp-fe815",
+    "storage_bucket": "pokerapp-fe815.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:703266157821:android:db119b5cc1e343eff93a94",
+        "android_client_info": {
+          "package_name": "com.example.poker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "703266157821-av9e6k85cauu4snrg4gbf976a96kgote.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMlI5O0xi8Qmj9eHxU1yp558rg0fJkW00"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "703266157821-av9e6k85cauu4snrg4gbf976a96kgote.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
