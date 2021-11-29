@@ -56,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
     int p2Money;
     int potMoney;
 
+    boolean playOver = false; // set play over to false
+    boolean hostTurn = true;
+    int timesRaised = 0;
+    boolean p1Fold =false;
+    boolean p2Fold =false;
+
     FirebaseDatabase database;
     DatabaseReference messageRef;
 
@@ -78,12 +84,6 @@ public class MainActivity extends AppCompatActivity {
                 role = "guest";
             }
         }
-
-
-        final boolean[] p1Fold = {false};
-        final boolean[] p2Fold = {false};
-
-
 
         fold = findViewById(R.id.fold);
         raise = findViewById(R.id.raise);
@@ -164,43 +164,34 @@ public class MainActivity extends AppCompatActivity {
                 p1MoneyView.setText("P1 Money: "+ p1Money);
                 p2MoneyView.setText("P2 Money: "+ p2Money);
 
-
-                boolean playOver = false; // set play over to false
-                boolean hostTurn = true;
-                boolean guestTurn = false;
-                int timesRaised = 0;
-
-                /*
-                while(!playOver) // alternate turns until play is over
+                if(hostTurn && role.equals("host"))
                 {
-                    if(hostTurn && role.equals("host"))
+                    fold.setVisibility(View.VISIBLE);
+                    raise.setVisibility(View.VISIBLE);
+                    stay.setVisibility(View.VISIBLE);
+                }
+                if(!hostTurn && role.equals("guest"))
+                {
+                    fold.setVisibility(View.VISIBLE);
+                    raise.setVisibility(View.VISIBLE);
+                    stay.setVisibility(View.VISIBLE);
+                }
+
+                if(p1Fold)
+                {
+
+                }
+                if(p2Fold)
+                {
+                    p1Money += potMoney;
+                    if(role.equals("host"))
                     {
-                        fold.setVisibility(View.VISIBLE);
-                        raise.setVisibility(View.VISIBLE);
-                        stay.setVisibility(View.VISIBLE);
-
-                        if(p1Fold[0])
-                        {
-                            p2Money += potMoney;
-                            if(role.equals("host"))
-                            {
-                                loseText.setVisibility(View.VISIBLE);
-                                play.setVisibility(View.VISIBLE);
-                            }
-                            if(role.equals("guest"))
-                                winText.setVisibility(View.VISIBLE);
-                        }
+                        winText.setVisibility(View.VISIBLE);
+                        play.setVisibility(View.VISIBLE);
                     }
-                    if(guestTurn && role.equals("guest"))
-                    {
-                        fold.setVisibility(View.VISIBLE);
-                        raise.setVisibility(View.VISIBLE);
-                        stay.setVisibility(View.VISIBLE);
-                    }
-
-                }*/
-
-
+                    if(role.equals("guest"))
+                        loseText.setVisibility(View.VISIBLE);
+                }
 
             }
 
@@ -209,14 +200,46 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        /*fold.setOnClickListener(new View.OnClickListener() {
+        fold.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(role.equals("host"))
-                    p1Fold[0] = true;
+                {
+                    p1Fold = true;
+                    fold.setVisibility(View.GONE);
+                    raise.setVisibility(View.GONE);
+                    stay.setVisibility(View.GONE);
+                    hostTurn = false;
+
+                    p2Money += potMoney;
+                    if(role.equals("guest"))
+                    {
+                        winText.setVisibility(View.VISIBLE);
+                    }
+                    if(role.equals("host"))
+                    {
+                        loseText.setVisibility(View.VISIBLE);
+                        play.setVisibility(View.VISIBLE);
+                    }
+                }
                 if(role.equals("guest"))
                 {
-                    p2Fold[0] = true;
+                    p2Fold = true;
+                    fold.setVisibility(View.GONE);
+                    raise.setVisibility(View.GONE);
+                    stay.setVisibility(View.GONE);
+                    hostTurn = true;
+
+                    p1Money += potMoney;
+                    if(role.equals("guest"))
+                    {
+                        loseText.setVisibility(View.VISIBLE);
+                    }
+                    if(role.equals("host"))
+                    {
+                        winText.setVisibility(View.VISIBLE);
+                        play.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
@@ -233,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
             }
-        });*/
+        });
 
 
 
