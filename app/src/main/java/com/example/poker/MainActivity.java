@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,12 +57,14 @@ public class MainActivity extends AppCompatActivity {
     int p1Money;
     int p2Money;
     int potMoney;
+    int i;
 
     boolean playOver = false; // set play over to false
     boolean hostTurn = true;
     int timesRaised = 0;
     boolean p1Fold =false;
     boolean p2Fold =false;
+    boolean stayed = false;
 
     FirebaseDatabase database;
     DatabaseReference messageRef;
@@ -94,11 +98,15 @@ public class MainActivity extends AppCompatActivity {
         card2 = (ImageView) findViewById(R.id.card2);
         card3 = (ImageView) findViewById(R.id.card3);
         card4 = (ImageView) findViewById(R.id.card4);
+
         poolcard_1 = (ImageView) findViewById(R.id.poolcard_1);
         poolcard_2 = (ImageView) findViewById(R.id.poolcard_2);
         poolcard_3 = (ImageView) findViewById(R.id.poolcard_3);
         poolcard_4 = (ImageView) findViewById(R.id.poolcard_4);
         poolcard_5 = (ImageView) findViewById(R.id.poolcard_5);
+        ImageView[] poolcards = {poolcard_1,poolcard_2,poolcard_3,poolcard_4,poolcard_5};
+
+
 
         p1MoneyView = (TextView) findViewById(R.id.p1MoneyView);
         p2MoneyView = (TextView) findViewById(R.id.p2MoneyView);
@@ -114,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
         playPoker.Deck deck = new playPoker.Deck();
 
-        p1Money = 3000;
-        p2Money = 3000;
+        p1Money = 2000;
+        p2Money = 2000;
         p1MoneyView.setText("P1 Money :" + p1Money);
         p2MoneyView.setText("P2 Money :" + p2Money);
 
@@ -134,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 loseText.setVisibility(View.GONE);
 
                 deck.shuffle();
-                int i = 0;
+                i = 0;
                 p2card1 = deck.cards.get(i++);
                 p1card1 = deck.cards.get(i++);
                 p2card2 = deck.cards.get(i++);
@@ -164,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 p1MoneyView.setText("P1 Money: "+ p1Money);
                 p2MoneyView.setText("P2 Money: "+ p2Money);
 
+
                 if(hostTurn && role.equals("host"))
                 {
                     fold.setVisibility(View.VISIBLE);
@@ -177,21 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     stay.setVisibility(View.VISIBLE);
                 }
 
-                if(p1Fold)
-                {
 
-                }
-                if(p2Fold)
-                {
-                    p1Money += potMoney;
-                    if(role.equals("host"))
-                    {
-                        winText.setVisibility(View.VISIBLE);
-                        play.setVisibility(View.VISIBLE);
-                    }
-                    if(role.equals("guest"))
-                        loseText.setVisibility(View.VISIBLE);
-                }
 
             }
 
@@ -248,13 +243,95 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                if(timesRaised == 1)
+                {
+                    if(role.equals("host"))
+                    {
+                        p1Money -= 100;
+                        potMoney += 100;
+                        timesRaised = 0;
+                        fold.setVisibility(View.GONE);
+                        raise.setVisibility(View.GONE);
+                        stay.setVisibility(View.GONE);
+
+                        if(role.equals("guest"))
+                        {
+                            fold.setVisibility(View.VISIBLE);
+                            raise.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    i++;
+                    if(i<9)
+                    {
+                        playPoker.Card card = deck.cards.get(i);
+                        int resource = getResources().getIdentifier(p2card1.toString().toLowerCase(),"drawable",getPackageName());
+                        poolcards[4-i].setImageResource(resource);
+                    }
+                    else
+                    {
+                        if(i==10)
+                        {
+                            //find who won
+                        }
+                    }
+
+                }
+
+                if(role.equals("host"))
+                {
+                    p1Money -= 100;
+                    potMoney += 100;
+                    timesRaised++;
+                    fold.setVisibility(View.GONE);
+                    raise.setVisibility(View.GONE);
+                    stay.setVisibility(View.GONE);
+
+                    if(role.equals("guest"))
+                    {
+                        fold.setVisibility(View.VISIBLE);
+                        raise.setVisibility(View.VISIBLE);
+                    }
+                }
+                if(role.equals("guest"))
+                {
+                    p2Money -= 100;
+                    potMoney += 100;
+                    timesRaised++;
+                    fold.setVisibility(View.GONE);
+                    raise.setVisibility(View.GONE);
+                    stay.setVisibility(View.GONE);
+
+                    if(role.equals("guest"))
+                    {
+                        fold.setVisibility(View.VISIBLE);
+                        raise.setVisibility(View.VISIBLE);
+                    }
+                }
+
+
+
+
             }
         });
 
         stay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                    if(role.equals("host"))
+                    {
+                        fold.setVisibility(View.GONE);
+                        raise.setVisibility(View.GONE);
+                        stay.setVisibility(View.GONE);
+                        hostTurn = false;
+                    }
+                    if(role.equals("guest"))
+                    {
+                        fold.setVisibility(View.GONE);
+                        raise.setVisibility(View.GONE);
+                        stay.setVisibility(View.GONE);
+                        hostTurn = true;
+                    }
+                    stayed = true;
             }
         });
 
