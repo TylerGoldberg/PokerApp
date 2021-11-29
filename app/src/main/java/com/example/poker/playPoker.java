@@ -25,7 +25,7 @@ public class playPoker{
     private int player_money;
 
 
-    public class Card implements Comparable{
+    public static class Card implements Comparable{
         Suit suit;
         Value value;
         public Card(Suit s, Value v)
@@ -44,7 +44,7 @@ public class playPoker{
         }
     }
 
-    public class Deck{
+    public static class Deck{
         ArrayList<Card> cards = new ArrayList<>();
         public Deck()
         {

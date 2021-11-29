@@ -69,11 +69,13 @@
 
 
         <Button
+
             android:id="@+id/fold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Fold" />
+            android:text="Fold"
+            style="?android:attr/buttonBarButtonStyle" />
 
         <Button
             android:id="@+id/raise"
@@ -82,14 +84,16 @@
             android:layout_weight="1"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:text="Raise" />
+            android:text="Raise"
+            style="?android:attr/buttonBarButtonStyle"/>
 
         <Button
             android:id="@+id/stay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Stay" />
+            android:text="Stay"
+            style="?android:attr/buttonBarButtonStyle"/>
 
     </LinearLayout>
 
