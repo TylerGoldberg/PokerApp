@@ -69,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference messageRef;
 
+    DatabaseReference p1Mon;
+    DatabaseReference p2Mon;
+    DatabaseReference potMon;
+    DatabaseReference turn;
+    DatabaseReference Raised;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +94,20 @@ public class MainActivity extends AppCompatActivity {
                 role = "guest";
             }
         }
+        p1Mon = database.getReference("/rooms/"+roomName+"/p1Mon");
+        p1Mon.setValue(2000);
+        p2Mon = database.getReference("/rooms/"+roomName+"/p2Mon");
+        p2Mon.setValue(2000);
+        potMon = database.getReference("/rooms/"+roomName+"/potMon");
+        potMon.setValue(0);
+        turn = database.getReference("/rooms/"+roomName+"/turn");
+        turn.setValue(1);
+        Raised = database.getReference("/rooms/"+roomName+"/Raised");
+        Raised.setValue(0);
+
+
+
+
 
         fold = findViewById(R.id.fold);
         raise = findViewById(R.id.raise);
@@ -140,6 +160,9 @@ public class MainActivity extends AppCompatActivity {
                 play.setVisibility(View.GONE); // get rid of play button and start play
                 winText.setVisibility(View.GONE);
                 loseText.setVisibility(View.GONE);
+                fold.setEnabled(true);
+                raise.setEnabled(true);
+                stay.setEnabled(true);
 
                 deck.shuffle();
                 i = 0;
@@ -166,8 +189,11 @@ public class MainActivity extends AppCompatActivity {
 
 
                 p1Money -= 20;
+                p1Mon.setValue(p1Money);
                 p2Money -= 20;
+                p2Mon.setValue(p2Money);
                 potMoney = 40;
+                potMon.setValue(potMoney);
 
                 p1MoneyView.setText("P1 Money: "+ p1Money);
                 p2MoneyView.setText("P2 Money: "+ p2Money);
@@ -198,44 +224,56 @@ public class MainActivity extends AppCompatActivity {
         fold.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(role.equals("host"))
+                if(hostTurn)
                 {
                     p1Fold = true;
-                    fold.setVisibility(View.GONE);
-                    raise.setVisibility(View.GONE);
-                    stay.setVisibility(View.GONE);
-                    hostTurn = false;
+
+                    if(role.equals("host"))
+                    {
+                        fold.setVisibility(View.GONE);
+                        raise.setVisibility(View.GONE);
+                        stay.setVisibility(View.GONE);
+                        play.setVisibility(View.VISIBLE);
+                        loseText.setVisibility(View.VISIBLE);
+                    }
+                    if(role.equals("guest"))
+                    {
+                        winText.setVisibility(View.VISIBLE);
+                    }
 
                     p2Money += potMoney;
-                    if(role.equals("guest"))
-                    {
-                        winText.setVisibility(View.VISIBLE);
-                    }
-                    if(role.equals("host"))
-                    {
-                        loseText.setVisibility(View.VISIBLE);
-                        play.setVisibility(View.VISIBLE);
-                    }
+                    p2Mon.setValue(p2Money);
+                    turn.setValue(0);
+
+
+
                 }
-                if(role.equals("guest"))
+                else
                 {
                     p2Fold = true;
-                    fold.setVisibility(View.GONE);
-                    raise.setVisibility(View.GONE);
-                    stay.setVisibility(View.GONE);
-                    hostTurn = true;
 
-                    p1Money += potMoney;
+                    if(role.equals("host"))
+                    {
+                        fold.setVisibility(View.GONE);
+                        raise.setVisibility(View.GONE);
+                        stay.setVisibility(View.GONE);
+                        winText.setVisibility(View.VISIBLE);
+                        play.setVisibility(View.VISIBLE);
+                    }
                     if(role.equals("guest"))
                     {
                         loseText.setVisibility(View.VISIBLE);
                     }
-                    if(role.equals("host"))
-                    {
-                        winText.setVisibility(View.VISIBLE);
-                        play.setVisibility(View.VISIBLE);
-                    }
+                    turn.setValue(1);
+
+                    p1Money += potMoney;
+                    potMon.setValue(0);
+                    p2Mon.setValue(p2Money);
+
                 }
+                fold.setEnabled(false);
+                raise.setEnabled(false);
+                stay.setEnabled(false);
             }
         });
 
@@ -245,27 +283,32 @@ public class MainActivity extends AppCompatActivity {
 
                 if(timesRaised == 1)
                 {
-                    if(role.equals("host"))
+                    if(hostTurn)
                     {
-                        p1Money -= 100;
-                        potMoney += 100;
-                        timesRaised = 0;
-                        fold.setVisibility(View.GONE);
-                        raise.setVisibility(View.GONE);
-                        stay.setVisibility(View.GONE);
 
-                        if(role.equals("guest"))
-                        {
-                            fold.setVisibility(View.VISIBLE);
-                            raise.setVisibility(View.VISIBLE);
-                        }
+                        p1Money -= 100;
+                        p1Mon.setValue(p1Mon);
+                        potMoney += 100;
+                        potMon.setValue(potMoney);
+                        Raised.setValue(0);
+                        turn.setValue(0);
+
+                    }
+                    else
+                    {
+                        p2Money -= 100;
+                        p2Mon.setValue(p2Mon);
+                        potMoney += 100;
+                        potMon.setValue(potMoney);
+                        Raised.setValue(0);
+                        turn.setValue(1);
                     }
                     i++;
                     if(i<9)
                     {
                         playPoker.Card card = deck.cards.get(i);
-                        int resource = getResources().getIdentifier(p2card1.toString().toLowerCase(),"drawable",getPackageName());
-                        poolcards[4-i].setImageResource(resource);
+                        int resource = getResources().getIdentifier(card.toString().toLowerCase(),"drawable",getPackageName());
+                        poolcards[3-i].setImageResource(resource);
                     }
                     else
                     {
@@ -274,37 +317,45 @@ public class MainActivity extends AppCompatActivity {
                             //find who won
                         }
                     }
-
+                    return;
                 }
 
-                if(role.equals("host"))
+                if(hostTurn)
                 {
                     p1Money -= 100;
+                    p1Mon.setValue(p1Money);
                     potMoney += 100;
-                    timesRaised++;
-                    fold.setVisibility(View.GONE);
-                    raise.setVisibility(View.GONE);
-                    stay.setVisibility(View.GONE);
-
+                    potMon.setValue(potMoney);
+                    Raised.setValue(timesRaised + 1);
+                    if(role.equals("host"))
+                    {
+                        fold.setVisibility(View.GONE);
+                        raise.setVisibility(View.GONE);
+                        stay.setVisibility(View.GONE);
+                    }
+                    turn.setValue(0);
                     if(role.equals("guest"))
                     {
-                        fold.setVisibility(View.VISIBLE);
-                        raise.setVisibility(View.VISIBLE);
+                        stay.setVisibility(View.GONE);
                     }
                 }
-                if(role.equals("guest"))
+                else
                 {
                     p2Money -= 100;
+                    p2Mon.setValue(p2Money);
                     potMoney += 100;
-                    timesRaised++;
-                    fold.setVisibility(View.GONE);
-                    raise.setVisibility(View.GONE);
-                    stay.setVisibility(View.GONE);
-
+                    potMon.setValue(potMoney);
+                    Raised.setValue(timesRaised + 1);
                     if(role.equals("guest"))
                     {
-                        fold.setVisibility(View.VISIBLE);
-                        raise.setVisibility(View.VISIBLE);
+                        fold.setVisibility(View.GONE);
+                        raise.setVisibility(View.GONE);
+                        stay.setVisibility(View.GONE);
+                    }
+                    turn.setValue(1);
+                    if(role.equals("host"))
+                    {
+                        stay.setVisibility(View.GONE);
                     }
                 }
 
@@ -317,29 +368,139 @@ public class MainActivity extends AppCompatActivity {
         stay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    if(role.equals("host"))
+                    if(role.equals("host") && hostTurn)
                     {
                         fold.setVisibility(View.GONE);
                         raise.setVisibility(View.GONE);
                         stay.setVisibility(View.GONE);
-                        hostTurn = false;
+                        turn.setValue(0);
+                        stayed = true;
+                        return;
                     }
-                    if(role.equals("guest"))
+                    if(role.equals("guest") && !hostTurn)
                     {
                         fold.setVisibility(View.GONE);
                         raise.setVisibility(View.GONE);
                         stay.setVisibility(View.GONE);
-                        hostTurn = true;
+                        turn.setValue(1);
+                        stayed = true;
+                        return;
                     }
-                    stayed = true;
+
             }
         });
 
 
 
-
+        addRoomListener();
     }
 
+    public void addRoomListener(){
+        p1Mon.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                p1Money = value;
+                p1MoneyView.setText("P1 money:" + p1Money);
+            }
 
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        p2Mon.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                p2Money = value;
+                p2MoneyView.setText("P2 money:" + p2Money);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        potMon.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                potMoney = value;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        Raised.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                timesRaised = value;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        turn.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                hostTurn = (value==1);
+                if(hostTurn && role.equals("host"))
+                {
+                    fold.setVisibility(View.VISIBLE);
+                    raise.setVisibility(View.VISIBLE);
+                    stay.setVisibility(View.VISIBLE);
+                }
+                if(hostTurn && role.equals("guest"))
+                {
+                    fold.setVisibility(View.GONE);
+                    raise.setVisibility(View.GONE);
+                    stay.setVisibility(View.GONE);
+                }
+                if(!hostTurn && role.equals("host"))
+                {
+                    fold.setVisibility(View.GONE);
+                    raise.setVisibility(View.GONE);
+                    stay.setVisibility(View.GONE);
+                }
+                if(!hostTurn && role.equals("guest"))
+                {
+                    fold.setVisibility(View.VISIBLE);
+                    raise.setVisibility(View.VISIBLE);
+                    stay.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+    };
 
 }
