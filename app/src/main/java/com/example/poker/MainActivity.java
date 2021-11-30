@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     int p1Money;
     int p2Money;
     int potMoney;
-    int i;
+    int i = 4;
 
     boolean playOver = false; // set play over to false
     boolean hostTurn = true;
@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference potMon;
     DatabaseReference turn;
     DatabaseReference Raised;
+    DatabaseReference I;
+    playPoker.Deck deck = new playPoker.Deck();
+
+    ImageView[] poolcards = {poolcard_1,poolcard_2,poolcard_3,poolcard_4,poolcard_5};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,10 +108,7 @@ public class MainActivity extends AppCompatActivity {
         turn.setValue(1);
         Raised = database.getReference("/rooms/"+roomName+"/Raised");
         Raised.setValue(0);
-
-
-
-
+        I = database.getReference("/rooms/"+roomName+"/I");
 
         fold = findViewById(R.id.fold);
         raise = findViewById(R.id.raise);
@@ -119,12 +120,11 @@ public class MainActivity extends AppCompatActivity {
         card3 = (ImageView) findViewById(R.id.card3);
         card4 = (ImageView) findViewById(R.id.card4);
 
-        poolcard_1 = (ImageView) findViewById(R.id.poolcard_1);
-        poolcard_2 = (ImageView) findViewById(R.id.poolcard_2);
-        poolcard_3 = (ImageView) findViewById(R.id.poolcard_3);
-        poolcard_4 = (ImageView) findViewById(R.id.poolcard_4);
-        poolcard_5 = (ImageView) findViewById(R.id.poolcard_5);
-        ImageView[] poolcards = {poolcard_1,poolcard_2,poolcard_3,poolcard_4,poolcard_5};
+        poolcards[0] = (ImageView) findViewById(R.id.poolcard_1);
+        poolcards[1] = (ImageView) findViewById(R.id.poolcard_2);
+        poolcards[2]= (ImageView) findViewById(R.id.poolcard_3);
+        poolcards[3] = (ImageView) findViewById(R.id.poolcard_4);
+        poolcards[4] = (ImageView) findViewById(R.id.poolcard_5);
 
 
 
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         raise.setVisibility(View.GONE);
         stay.setVisibility(View.GONE);
 
-        playPoker.Deck deck = new playPoker.Deck();
+
 
         p1Money = 2000;
         p2Money = 2000;
@@ -148,78 +148,31 @@ public class MainActivity extends AppCompatActivity {
         p2MoneyView.setText("P2 Money :" + p2Money);
 
 
-        if(role.equals("guest")) // for now only host can start game
+
+
+
+        play.setVisibility(View.GONE); // get rid of play button and start play
+        winText.setVisibility(View.GONE);
+        loseText.setVisibility(View.GONE);
+        fold.setEnabled(true);
+        raise.setEnabled(true);
+        stay.setEnabled(true);
+
+        deal();
+
+        if(hostTurn && role.equals("host"))
         {
-            play.setVisibility(View.GONE);
+            fold.setVisibility(View.VISIBLE);
+            raise.setVisibility(View.VISIBLE);
+            stay.setVisibility(View.VISIBLE);
+        }
+        if(!hostTurn && role.equals("guest"))
+        {
+            fold.setVisibility(View.VISIBLE);
+            raise.setVisibility(View.VISIBLE);
+            stay.setVisibility(View.VISIBLE);
         }
 
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                play.setVisibility(View.GONE); // get rid of play button and start play
-                winText.setVisibility(View.GONE);
-                loseText.setVisibility(View.GONE);
-                fold.setEnabled(true);
-                raise.setEnabled(true);
-                stay.setEnabled(true);
-
-                deck.shuffle();
-                i = 0;
-                p2card1 = deck.cards.get(i++);
-                p1card1 = deck.cards.get(i++);
-                p2card2 = deck.cards.get(i++);
-                p1card2 = deck.cards.get(i++); // deal cards
-
-                if(role.equals("host"))
-                {
-                    int cardResource = getResources().getIdentifier((p1card1.toString()).toLowerCase(),"drawable",getPackageName());
-                    card1.setImageResource(cardResource);
-                    cardResource = getResources().getIdentifier(p1card2.toString().toLowerCase(),"drawable",getPackageName());
-                    card2.setImageResource(cardResource);
-                }
-
-                if(role.equals("guest"))
-                {
-                    int cardResource = getResources().getIdentifier(p2card1.toString().toLowerCase(),"drawable",getPackageName());
-                    card3.setImageResource(cardResource);
-                    cardResource = getResources().getIdentifier(p2card2.toString().toLowerCase(),"drawable",getPackageName());
-                    card4.setImageResource(cardResource);
-                }
-
-
-                p1Money -= 20;
-                p1Mon.setValue(p1Money);
-                p2Money -= 20;
-                p2Mon.setValue(p2Money);
-                potMoney = 40;
-                potMon.setValue(potMoney);
-
-                p1MoneyView.setText("P1 Money: "+ p1Money);
-                p2MoneyView.setText("P2 Money: "+ p2Money);
-
-
-                if(hostTurn && role.equals("host"))
-                {
-                    fold.setVisibility(View.VISIBLE);
-                    raise.setVisibility(View.VISIBLE);
-                    stay.setVisibility(View.VISIBLE);
-                }
-                if(!hostTurn && role.equals("guest"))
-                {
-                    fold.setVisibility(View.VISIBLE);
-                    raise.setVisibility(View.VISIBLE);
-                    stay.setVisibility(View.VISIBLE);
-                }
-
-
-
-            }
-
-
-
-
-        });
 
         fold.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -233,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
                         fold.setVisibility(View.GONE);
                         raise.setVisibility(View.GONE);
                         stay.setVisibility(View.GONE);
-                        play.setVisibility(View.VISIBLE);
                         loseText.setVisibility(View.VISIBLE);
                     }
                     if(role.equals("guest"))
@@ -258,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                         raise.setVisibility(View.GONE);
                         stay.setVisibility(View.GONE);
                         winText.setVisibility(View.VISIBLE);
-                        play.setVisibility(View.VISIBLE);
+
                     }
                     if(role.equals("guest"))
                     {
@@ -271,9 +223,14 @@ public class MainActivity extends AppCompatActivity {
                     p2Mon.setValue(p2Money);
 
                 }
-                fold.setEnabled(false);
-                raise.setEnabled(false);
-                stay.setEnabled(false);
+                I.setValue(4);
+                for(int j = 0; j<5;j++)
+                {
+                    int hold = getResources().getIdentifier("redjoker","drawable",getPackageName());
+                    poolcards[j].setImageResource(hold);
+                }
+
+                deal();
             }
         });
 
@@ -281,9 +238,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(timesRaised == 1)
+                if(timesRaised > 1)
                 {
-                    if(hostTurn)
+                    dealpoolcard();
+                    turn.setValue(hostTurn ? 0 : 1);
+                    return;
+
+                    /*if(hostTurn)
                     {
 
                         p1Money -= 100;
@@ -303,22 +264,25 @@ public class MainActivity extends AppCompatActivity {
                         Raised.setValue(0);
                         turn.setValue(1);
                     }
-                    i++;
+
                     if(i<9)
                     {
                         playPoker.Card card = deck.cards.get(i);
                         int resource = getResources().getIdentifier(card.toString().toLowerCase(),"drawable",getPackageName());
-                        poolcards[3-i].setImageResource(resource);
+                        poolcards[i-4].setImageResource(resource);
+                        I.setValue(i+1);
                     }
                     else
                     {
                         if(i==10)
                         {
                             //find who won
+                            deal();
                         }
                     }
-                    return;
+                    return;*/
                 }
+
 
                 if(hostTurn)
                 {
@@ -365,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         stay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -393,6 +358,56 @@ public class MainActivity extends AppCompatActivity {
 
 
         addRoomListener();
+    }
+
+    public void deal(){
+        Raised.setValue(0);
+        deck.shuffle();
+        p2card1 = deck.cards.get(0);
+        p1card1 = deck.cards.get(1);
+        p2card2 = deck.cards.get(2);
+        p1card2 = deck.cards.get(3); // deal cards
+        I.setValue(4);
+        if(role.equals("host"))
+        {
+            int cardResource = getResources().getIdentifier((p1card1.toString()).toLowerCase(),"drawable",getPackageName());
+            card1.setImageResource(cardResource);
+            cardResource = getResources().getIdentifier(p1card2.toString().toLowerCase(),"drawable",getPackageName());
+            card2.setImageResource(cardResource);
+        }
+
+        if(role.equals("guest"))
+        {
+            int cardResource = getResources().getIdentifier(p2card1.toString().toLowerCase(),"drawable",getPackageName());
+            card3.setImageResource(cardResource);
+            cardResource = getResources().getIdentifier(p2card2.toString().toLowerCase(),"drawable",getPackageName());
+            card4.setImageResource(cardResource);
+        }
+
+
+        p1Money -= 20;
+        p1Mon.setValue(p1Money);
+        p2Money -= 20;
+        p2Mon.setValue(p2Money);
+        potMoney = 40;
+        potMon.setValue(potMoney);
+    }
+
+    public void dealpoolcard()
+    {
+
+        if(i>=9)
+        {
+            finisher();
+            return;
+        }
+        I.setValue(i+1);
+
+    }
+
+    public void finisher()
+    {
+
     }
 
     public void addRoomListener(){
@@ -437,6 +452,25 @@ public class MainActivity extends AppCompatActivity {
                 // whenever data at this location is updated.
                 int value = dataSnapshot.getValue(int.class);
                 potMoney = value;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        I.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                playPoker.Card card = deck.cards.get(i);
+                int resource = getResources().getIdentifier(card.toString().toLowerCase(),"drawable",getPackageName());
+                poolcards[i-4].setImageResource(resource);
+                i = value;
             }
 
             @Override
