@@ -33,6 +33,27 @@ public class playPoker{
             suit = s;
             value = v;
         }
+
+        public Card()
+        {
+        }
+
+        public Suit getSuit(){
+            return suit;
+        }
+
+        public void setSuit(Suit suit){
+            this.suit = suit;
+        }
+
+        public Value getValue(){
+            return value;
+        }
+
+        public void setValue(Value value){
+            this.value = value;
+        }
+
         @Override
         public String toString() {
             return suit.toString() + value.toString();
@@ -65,7 +86,7 @@ public class playPoker{
         Collections.sort(cards);
     }
 
-    public boolean findRoyal(ArrayList<Card> allcards) //doesnt work currently
+    public static boolean findRoyal(ArrayList<Card> allcards) //doesnt work currently
     {
         Suit s = null;
         int len = allcards.size();
@@ -118,7 +139,7 @@ public class playPoker{
 
     }
 
-    public int findFlushStraight(ArrayList<Card> allcards)
+    public static int findFlushStraight(ArrayList<Card> allcards)
     {
         int count = 1;
         int highest = 0;
@@ -157,7 +178,7 @@ public class playPoker{
         return highest;
     }
 
-    public int findKind(ArrayList<Card> allcards)
+    public static int findKind(ArrayList<Card> allcards)
     {
         int count = 1;
         int highest = 1;
@@ -178,7 +199,7 @@ public class playPoker{
         return highest;
     }
 
-    public int findHouse(ArrayList<Card> allcards) //return highest card of the triple
+    public static int findHouse(ArrayList<Card> allcards) //return highest card of the triple
     {
         boolean haveTriple = false;
         int count = 0;
@@ -224,7 +245,7 @@ public class playPoker{
         return 0;
     }
 
-    public boolean findFlush(ArrayList<Card> allcards)
+    public static boolean findFlush(ArrayList<Card> allcards)
     {
         int c =0;
         int s =0;
@@ -246,7 +267,7 @@ public class playPoker{
         return c >= 5 || s >= 5 || h >= 5 || d >= 5;
     }
 
-    public boolean findStraight(ArrayList<Card> allcards) // assumes already sorted
+    public static int findStraight(ArrayList<Card> allcards) // assumes already sorted
     {
         int count = 1;
         int len = allcards.size();
@@ -259,12 +280,12 @@ public class playPoker{
             else
                 count = 1;
             if(count >=5)
-                return true;
+                return 1;
         }
-        return false;
+        return 0;
     }
 
-    public int[] findTwoPair(ArrayList<Card> allcards)
+    public static int[] findTwoPair(ArrayList<Card> allcards)
     {
         int count = 0;
         int len = allcards.size();
@@ -300,7 +321,7 @@ public class playPoker{
         return null;
     }
 
-    public int findHigh(ArrayList<Card> allcards)
+    public static int findHigh(ArrayList<Card> allcards)
     {
         int len = allcards.size();
         return allcards.get(len-1).value.getval();

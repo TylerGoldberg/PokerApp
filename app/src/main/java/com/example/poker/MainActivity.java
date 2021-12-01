@@ -16,9 +16,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     playPoker.Card p1card2;
     playPoker.Card p2card1;
     playPoker.Card p2card2;
+    List<playPoker.Card> cardarray = new ArrayList<>();
 
 
     TextView winText;
@@ -62,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
     boolean playOver = false; // set play over to false
     boolean hostTurn = true;
     int timesRaised = 0;
-    boolean p1Fold =false;
-    boolean p2Fold =false;
+    boolean p1Lose =false;
+    boolean p2Lose =false;
     boolean stayed = false;
 
     FirebaseDatabase database;
@@ -72,9 +75,13 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference p1Mon;
     DatabaseReference p2Mon;
     DatabaseReference potMon;
+    DatabaseReference p1Lost;
+    DatabaseReference p2Lost;
     DatabaseReference turn;
     DatabaseReference Raised;
     DatabaseReference I;
+    DatabaseReference allcards;
+    DatabaseReference STAY;
     playPoker.Deck deck = new playPoker.Deck();
 
     ImageView[] poolcards = {poolcard_1,poolcard_2,poolcard_3,poolcard_4,poolcard_5};
@@ -106,9 +113,16 @@ public class MainActivity extends AppCompatActivity {
         potMon.setValue(0);
         turn = database.getReference("/rooms/"+roomName+"/turn");
         turn.setValue(1);
+        p1Lost = database.getReference("/rooms/"+roomName+"/p1Lost");
+        p1Lost.setValue(0);
+        p2Lost = database.getReference("/rooms/"+roomName+"/p2Lost");
+        p2Lost.setValue(0);
         Raised = database.getReference("/rooms/"+roomName+"/Raised");
         Raised.setValue(0);
+        STAY = database.getReference("/rooms/"+roomName+"/STAY");
+        STAY.setValue(0);
         I = database.getReference("/rooms/"+roomName+"/I");
+        allcards = database.getReference("/rooms/"+roomName+"/allcards");
 
         fold = findViewById(R.id.fold);
         raise = findViewById(R.id.raise);
@@ -149,7 +163,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+        for(int j = 0; j<10;j++)
+        {
+            cardarray.add(null);
+        }
 
         play.setVisibility(View.GONE); // get rid of play button and start play
         winText.setVisibility(View.GONE);
@@ -173,13 +190,20 @@ public class MainActivity extends AppCompatActivity {
             stay.setVisibility(View.VISIBLE);
         }
 
+        addRoomListener();
 
         fold.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fold.setVisibility(View.GONE);
+                raise.setVisibility(View.GONE);
+                stay.setVisibility(View.GONE);
+                winText.setVisibility(View.GONE);
+                loseText.setVisibility(View.GONE);
                 if(hostTurn)
                 {
-                    p1Fold = true;
+                    p1Lose = true;
+                    p1Lost.setValue(1);
 
                     if(role.equals("host"))
                     {
@@ -202,7 +226,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    p2Fold = true;
+                    p2Lose = true;
+                    p2Lost.setValue(1);
 
                     if(role.equals("host"))
                     {
@@ -223,12 +248,6 @@ public class MainActivity extends AppCompatActivity {
                     p2Mon.setValue(p2Money);
 
                 }
-                I.setValue(4);
-                for(int j = 0; j<5;j++)
-                {
-                    int hold = getResources().getIdentifier("redjoker","drawable",getPackageName());
-                    poolcards[j].setImageResource(hold);
-                }
 
                 deal();
             }
@@ -237,12 +256,18 @@ public class MainActivity extends AppCompatActivity {
         raise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(timesRaised > 1)
+                fold.setVisibility(View.GONE);
+                raise.setVisibility(View.GONE);
+                stay.setVisibility(View.GONE);
+                winText.setVisibility(View.GONE);
+                loseText.setVisibility(View.GONE);
+                if(timesRaised == 1)
                 {
                     dealpoolcard();
+                    Raised.setValue(0);
                     turn.setValue(hostTurn ? 0 : 1);
                     return;
+
 
                     /*if(hostTurn)
                     {
@@ -282,14 +307,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     return;*/
                 }
-
-
                 if(hostTurn)
                 {
-                    p1Money -= 100;
+                    p1Money -= 20;
                     p1Mon.setValue(p1Money);
-                    potMoney += 100;
+                    potMoney += 20;
                     potMon.setValue(potMoney);
+                    turn.setValue(0);
                     Raised.setValue(timesRaised + 1);
                     if(role.equals("host"))
                     {
@@ -297,7 +321,6 @@ public class MainActivity extends AppCompatActivity {
                         raise.setVisibility(View.GONE);
                         stay.setVisibility(View.GONE);
                     }
-                    turn.setValue(0);
                     if(role.equals("guest"))
                     {
                         stay.setVisibility(View.GONE);
@@ -305,10 +328,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    p2Money -= 100;
+                    p2Money -= 20;
                     p2Mon.setValue(p2Money);
-                    potMoney += 100;
+                    potMoney += 20;
                     potMon.setValue(potMoney);
+                    turn.setValue(1);
                     Raised.setValue(timesRaised + 1);
                     if(role.equals("guest"))
                     {
@@ -316,7 +340,6 @@ public class MainActivity extends AppCompatActivity {
                         raise.setVisibility(View.GONE);
                         stay.setVisibility(View.GONE);
                     }
-                    turn.setValue(1);
                     if(role.equals("host"))
                     {
                         stay.setVisibility(View.GONE);
@@ -326,29 +349,38 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
             }
+
         });
 
 
         stay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fold.setVisibility(View.GONE);
+                raise.setVisibility(View.GONE);
+                stay.setVisibility(View.GONE);
+                winText.setVisibility(View.GONE);
+                loseText.setVisibility(View.GONE);
+                if(stayed)
+                {
+                    stayed = false;
+                    turn.setValue(hostTurn ? 0 : 1);
+                    dealpoolcard();
+                    return;
+                }
+
+                STAY.setValue(1);
                     if(role.equals("host") && hostTurn)
                     {
-                        fold.setVisibility(View.GONE);
-                        raise.setVisibility(View.GONE);
-                        stay.setVisibility(View.GONE);
                         turn.setValue(0);
-                        stayed = true;
                         return;
                     }
                     if(role.equals("guest") && !hostTurn)
                     {
-                        fold.setVisibility(View.GONE);
-                        raise.setVisibility(View.GONE);
-                        stay.setVisibility(View.GONE);
                         turn.setValue(1);
-                        stayed = true;
                         return;
                     }
 
@@ -356,33 +388,48 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-        addRoomListener();
     }
 
     public void deal(){
         Raised.setValue(0);
         deck.shuffle();
-        p2card1 = deck.cards.get(0);
-        p1card1 = deck.cards.get(1);
-        p2card2 = deck.cards.get(2);
-        p1card2 = deck.cards.get(3); // deal cards
+
+        for(int j = 1; j<10;j++)
+        {
+            cardarray.set(j,null);
+        }
+        System.out.println("Before deal:" + cardarray);
+
+        for(int j = 1; j < 5; j++)
+        {
+            cardarray.set(j,deck.cards.get(j));
+        }
+        System.out.println("After deal: " + cardarray);
+        allcards.setValue(null);
+        allcards.setValue(cardarray);
+        System.out.println("After set: " + cardarray);
+
         I.setValue(4);
+
+        System.out.println("After I: " + cardarray);
+
         if(role.equals("host"))
         {
-            int cardResource = getResources().getIdentifier((p1card1.toString()).toLowerCase(),"drawable",getPackageName());
+            int cardResource = getResources().getIdentifier(cardarray.get(1).toString().toLowerCase(),"drawable",getPackageName());
             card1.setImageResource(cardResource);
-            cardResource = getResources().getIdentifier(p1card2.toString().toLowerCase(),"drawable",getPackageName());
+            cardResource = getResources().getIdentifier(cardarray.get(2).toString().toLowerCase(),"drawable",getPackageName());
             card2.setImageResource(cardResource);
         }
 
         if(role.equals("guest"))
         {
-            int cardResource = getResources().getIdentifier(p2card1.toString().toLowerCase(),"drawable",getPackageName());
+            int cardResource = getResources().getIdentifier(cardarray.get(3).toString().toLowerCase(),"drawable",getPackageName());
             card3.setImageResource(cardResource);
-            cardResource = getResources().getIdentifier(p2card2.toString().toLowerCase(),"drawable",getPackageName());
+            cardResource = getResources().getIdentifier(cardarray.get(4).toString().toLowerCase(),"drawable",getPackageName());
             card4.setImageResource(cardResource);
         }
+
+        System.out.println("After deal: " + cardarray);
 
 
         p1Money -= 20;
@@ -399,15 +446,142 @@ public class MainActivity extends AppCompatActivity {
         if(i>=9)
         {
             finisher();
+            deal();
             return;
         }
         I.setValue(i+1);
+        allcards.setValue(null);
+        allcards.setValue(cardarray);
 
     }
 
     public void finisher()
     {
+        ArrayList<playPoker.Card> p1 = new ArrayList<>(cardarray);
+        p1.remove(4);
+        p1.remove(3);
+        p1.remove(0);
+        ArrayList<playPoker.Card> p2 = new ArrayList<>(cardarray);
+        p2.remove(2);
+        p2.remove(1);
+        p2.remove(0);
+        if(playPoker.findRoyal(p1))
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(playPoker.findRoyal(p2))
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        int ffs1 = playPoker.findFlushStraight(p1);
+        int ffs2 = playPoker.findFlushStraight(p2);
+        if(ffs1>ffs2)
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(ffs2>ffs1)
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        int p1Kind = playPoker.findKind(p1);
+        int p2Kind = playPoker.findKind(p2);
+        if(p1Kind==4)
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(p2Kind==4)
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        int fh1 = playPoker.findHouse(p1);
+        int fh2 = playPoker.findHouse(p2);
+        if(fh1>fh2)
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(fh2>fh1)
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        if(playPoker.findFlush(p1))
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(playPoker.findFlush(p2))
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        if(playPoker.findFlush(p1))
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(playPoker.findFlush(p2))
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        int s1 = playPoker.findStraight(p2);
+        int s2 = playPoker.findStraight(p2);
+        if(s1>s2)
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(s2>s1)
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        if(p1Kind==3)
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        if(p2Kind==3)
+        {
+            p1Lost.setValue(1);
+            return;
+        }
+        int[] tp1 = playPoker.findTwoPair(p1);
+        int[] tp2 = playPoker.findTwoPair(p2);
+        if(tp1!=null)
+        {
+            if(tp2==null ||(tp1[0] > tp2[0] || (tp1[0] == tp2[0] && tp1[1] >= tp1[1])) )
+            {
+                p2Lost.setValue(1);
+                return;
+            }
 
+        }
+        if(tp2!=null)
+        {
+            if(tp1==null ||(tp2[0] > tp1[0] || (tp2[0] == tp1[0] && tp2[1] >= tp1[1])) )
+            {
+                p1Lost.setValue(1);
+                return;
+            }
+
+        }
+        if(playPoker.findHigh(p1)>=playPoker.findHigh(p2))
+        {
+            p2Lost.setValue(1);
+            return;
+        }
+        else{
+            p1Lost.setValue(1);
+            return;
+        }
     }
 
     public void addRoomListener(){
@@ -467,10 +641,17 @@ public class MainActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 int value = dataSnapshot.getValue(int.class);
+                i = value;
                 playPoker.Card card = deck.cards.get(i);
                 int resource = getResources().getIdentifier(card.toString().toLowerCase(),"drawable",getPackageName());
-                poolcards[i-4].setImageResource(resource);
-                i = value;
+                if(i>=5)
+                    poolcards[i-5].setImageResource(resource);
+                cardarray.set(i,card);
+                cardarray.set(0,card);
+                System.out.println(cardarray);
+                allcards.setValue(null);
+                allcards.setValue(cardarray);
+
             }
 
             @Override
@@ -487,6 +668,10 @@ public class MainActivity extends AppCompatActivity {
                 // whenever data at this location is updated.
                 int value = dataSnapshot.getValue(int.class);
                 timesRaised = value;
+                if(timesRaised>=1)
+                {
+                    stay.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -509,11 +694,11 @@ public class MainActivity extends AppCompatActivity {
                     raise.setVisibility(View.VISIBLE);
                     stay.setVisibility(View.VISIBLE);
                 }
-                if(hostTurn && role.equals("guest"))
+                if(!hostTurn && role.equals("guest"))
                 {
-                    fold.setVisibility(View.GONE);
-                    raise.setVisibility(View.GONE);
-                    stay.setVisibility(View.GONE);
+                    fold.setVisibility(View.VISIBLE);
+                    raise.setVisibility(View.VISIBLE);
+                    stay.setVisibility(View.VISIBLE);
                 }
                 if(!hostTurn && role.equals("host"))
                 {
@@ -521,12 +706,160 @@ public class MainActivity extends AppCompatActivity {
                     raise.setVisibility(View.GONE);
                     stay.setVisibility(View.GONE);
                 }
-                if(!hostTurn && role.equals("guest"))
+                if(hostTurn && role.equals("guest"))
                 {
-                    fold.setVisibility(View.VISIBLE);
-                    raise.setVisibility(View.VISIBLE);
-                    stay.setVisibility(View.VISIBLE);
+                    fold.setVisibility(View.GONE);
+                    raise.setVisibility(View.GONE);
+                    stay.setVisibility(View.GONE);
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        p1Lost.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                if(dataSnapshot!=null)
+                {
+                    int value = dataSnapshot.getValue(int.class);
+                    p1Lose = (value==1);
+                    p2Mon.setValue(p2Money+ potMoney);
+                    potMon.setValue(0);
+                    if(p1Lose && role.equals("guest"))
+                    {
+                        loseText.setVisibility(View.GONE);
+                        winText.setVisibility(View.VISIBLE);
+                    }
+                    if(p1Lose && role.equals("host"))
+                    {
+                        loseText.setVisibility(View.VISIBLE);
+                        winText.setVisibility(View.GONE);
+                    }
+                    p1Lost.setValue(0);
+
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        p2Lost.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                p2Lose = (value==1);
+                if(p2Lose && role.equals("host"))
+                {
+                    loseText.setVisibility(View.GONE);
+                    winText.setVisibility(View.VISIBLE);
+                }
+                if(p2Lose && role.equals("guest"))
+                {
+                    loseText.setVisibility(View.VISIBLE);
+                    winText.setVisibility(View.GONE);
+                }
+                p2Lost.setValue(0);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+        STAY.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                int value = dataSnapshot.getValue(int.class);
+                stayed = (value==1);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+
+
+
+        allcards.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                if(dataSnapshot==null)
+                    return;
+                GenericTypeIndicator<List<playPoker.Card>> t = new GenericTypeIndicator<List<playPoker.Card>>() {
+                };
+                 cardarray = dataSnapshot.getValue(t);
+                 if(cardarray == null)
+                     return;
+                for(int k = 0; k<10;k++)
+                {
+                    if(k >= cardarray.size())
+                    {
+                        cardarray.add(null);
+                    }
+                }
+                /*for(DataSnapshot snapshot : dataSnapshot.getChildren() )
+                {
+                    playPoker.Suit suit = snapshot.child("suit").getValue(playPoker.Suit.class);
+                    playPoker.Value value = snapshot.child("value").getValue(playPoker.Value.class);
+                    playPoker.Card card = new playPoker.Card(suit,value);
+                    cardarray.set(k,card);
+                }*/
+                for(int j = 1; j<cardarray.size();j++)
+                {
+                    System.out.println("yeah im here");
+                    if(role.equals("host")&&j==0)
+                    {
+                        int cardResource = getResources().getIdentifier((cardarray.get(1).toString()).toLowerCase(),"drawable",getPackageName());
+                        card1.setImageResource(cardResource);
+                        cardResource = getResources().getIdentifier(cardarray.get(2).toString().toLowerCase(),"drawable",getPackageName());
+                        card2.setImageResource(cardResource);
+                    }
+
+                    if(role.equals("guest")&&j==2)
+                    {
+                        int cardResource = getResources().getIdentifier(cardarray.get(3).toString().toLowerCase(),"drawable",getPackageName());
+                        card3.setImageResource(cardResource);
+                        cardResource = getResources().getIdentifier(cardarray.get(4).toString().toLowerCase(),"drawable",getPackageName());
+                        card4.setImageResource(cardResource);
+                    }
+                    if(j >= 5 && cardarray.get(j)==null)
+                    {
+                        poolcards[j-5].setImageResource(R.drawable.red_joker);
+                        continue;
+                    }
+                    if(j>=5 && cardarray.get(j) != null)
+                    {
+                        int cardResource = getResources().getIdentifier((cardarray.get(j).toString()).toLowerCase(),"drawable",getPackageName());
+                        poolcards[j-5].setImageResource(cardResource);
+                    }
+                }
+                System.out.println(cardarray);
             }
 
             @Override
